@@ -36,9 +36,10 @@ En la vista de detalle del estudiante, encontrarás la interfaz de chat. Esta he
 
 ### Cómo usar el Chat:
 
-1.  **Ver el Historial**: La ventana de chat mostrará la conversación previa con el tutor.
-2.  **Escribir un Mensaje**: En la parte inferior, hay un campo de texto donde puedes escribir una pregunta o un mensaje para el tutor.
-3.  **Enviar**: Haz clic en el botón "Enviar" para que el tutor reciba tu mensaje.
-4.  **Recibir Respuesta**: El tutor (impulsado por IA) analizará el mensaje y proporcionará una respuesta que aparecerá en la ventana de chat.
+1.  **Seleccionar un Tutor**: Encima de la ventana de chat, verás pestañas para los diferentes tutores disponibles (e.g., "Tutor de Matemáticas", "Tutor de Lengua"). Haz clic en la pestaña del tutor con el que deseas conversar.
+2.  **Ver el Historial**: La ventana de chat mostrará la conversación previa con el tutor seleccionado.
+3.  **Escribir un Mensaje**: En la parte inferior, hay un campo de texto donde puedes escribir tu pregunta.
+4.  **Enviar**: Haz clic en el botón "Enviar".
+5.  **Recibir Respuesta**: El tutor de IA especializado en esa materia analizará el mensaje y proporcionará una respuesta.
 
-Esta herramienta está diseñada para ofrecer apoyo académico personalizado y al instante.
+Esta herramienta está diseñada para ofrecer apoyo académico personalizado y al instante en múltiples áreas del conocimiento.

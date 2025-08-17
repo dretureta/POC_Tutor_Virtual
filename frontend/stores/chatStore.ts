@@ -40,35 +40,29 @@ export const useChatStore = defineStore('chatStore', {
     },
 
     async sendMessage(studentId: string, tutorType: string, message: string) {
-        // Add user message immediately for better UX
-        const userMessage: Message = { role: 'user', content: message }
-        if (!this.conversation) {
-            // Create a new conversation locally first
-            this.conversation = { id: '', tutor_type: tutorType, messages: [userMessage] }
+        const userMessage: Message = { role: 'user', content: message };
+        if (!this.conversation || this.conversation.tutor_type !== tutorType) {
+            this.conversation = { id: '', tutor_type: tutorType, messages: [userMessage] };
         } else {
-            this.conversation.messages.push(userMessage)
+            this.conversation.messages.push(userMessage);
         }
 
-        // The n8n webhook will handle creating/updating the conversation in the DB
-        // and returning the assistant's response.
-        // For the POC, we'll simulate a call to the n8n webhook endpoint.
-        // The actual call would be to a specific webhook URL, not the main API.
-        try {
-            const response = await $fetch<string>('/api/tutor-math', { // This URL is a placeholder for the n8n webhook
-                method: 'POST',
-                body: {
-                    student_id: studentId,
-                    message: message
-                }
-            })
+        const webhookPath = tutorType === 'Matemáticas' ? '/tutor-math' : '/tutor-language';
 
-            const assistantMessage: Message = { role: 'assistant', content: response }
-            this.conversation.messages.push(assistantMessage)
+        try {
+            // NOTE: In a real app, this would be a call to the n8n webhook URL,
+            // which is on a different port. This is a placeholder.
+            const response = await $fetch<string>(`/api${webhookPath}`, {
+                method: 'POST',
+                body: { student_id: studentId, message: message }
+            });
+
+            const assistantMessage: Message = { role: 'assistant', content: response };
+            this.conversation.messages.push(assistantMessage);
 
         } catch (e: any) {
-            this.error = "Error al conectar con el tutor: " + e.message
-            // remove the user message if the call failed
-            this.conversation.messages.pop()
+            this.error = `Error al conectar con el tutor de ${tutorType}: ${e.message}`;
+            this.conversation.messages.pop();
         }
     },
   },

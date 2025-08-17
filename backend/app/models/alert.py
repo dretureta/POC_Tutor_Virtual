@@ -13,5 +13,5 @@ class Alert(Base):
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    student_id = Column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False)
+    student_id = Column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=True)
     student = relationship("Student")

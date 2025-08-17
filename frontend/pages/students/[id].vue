@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Loading State -->
-    <div v-if="studentStore.loading" class="text-center">
+    <div v-if="studentStore.loading && !student" class="text-center">
       Cargando datos del estudiante...
     </div>
 
@@ -40,15 +40,36 @@
         </div>
       </div>
 
-      <!-- Chat Interface -->
-      <ChatInterface :student-id="student.id" tutor-type="Matemáticas" />
+      <!-- Chat Section -->
+      <div>
+        <div class="mb-4 border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                    v-for="tutor in tutors"
+                    :key="tutor.name"
+                    @click="selectedTutor = tutor.name"
+                    :class="[
+                        tutor.name === selectedTutor
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                        'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                    ]"
+                >
+                    Tutor de {{ tutor.name }}
+                </button>
+            </nav>
+        </div>
+
+        <!-- Render ChatInterface for the selected tutor -->
+        <ChatInterface :student-id="student.id" :tutor-type="selectedTutor" :key="selectedTutor" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useStudentStore } from '~/stores/studentStore'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import RiskBadge from '~/components/RiskBadge.vue'
 import EvaluationCard from '~/components/EvaluationCard.vue'
 import ChatInterface from '~/components/ChatInterface.vue'
@@ -61,9 +82,16 @@ const route = useRoute()
 const studentStore = useStudentStore()
 const studentId = route.params.id as string
 
-// Fetch student data
-await studentStore.fetchStudentById(studentId)
+// --- Tutors ---
+const tutors = [
+  { name: 'Matemáticas', webhook: '/tutor-math' },
+  { name: 'Lengua', webhook: '/tutor-language' },
+]
+const selectedTutor = ref(tutors[0].name)
 
-// Computed property to get the student from the store
+// --- Fetch student data ---
+// We don't wait for it here so the page can render while loading
+studentStore.fetchStudentById(studentId)
+
 const student = computed(() => studentStore.selectedStudent)
 </script>
