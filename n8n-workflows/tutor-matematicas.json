@@ -1,0 +1,143 @@
+{
+  "name": "Tutor de Matemáticas",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "tutor-math",
+        "httpMethod": "POST"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{'http://backend:8000/api/conversations/' + $json.body.student_id}}",
+        "options": {}
+      },
+      "name": "Obtener Historial",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        650,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "system_prompt",
+              "value": "Eres un tutor de matemáticas amigable y experto, especializado en el currículum de liceo de Uruguay. Explica los conceptos paso a paso de forma clara y sencilla. Tu objetivo es ayudar al estudiante a entender, no darle la respuesta directamente. Pregúntale qué ha intentado hasta ahora."
+            }
+          ],
+          "json": [
+            {
+              "name": "messages",
+              "value": "={{$node['Obtener Historial'].json[0] ? $node['Obtener Historial'].json[0].messages : []}}"
+            },
+            {
+              "name": "new_message",
+              "value": "={{ { 'role': 'user', 'content': $json.body.message } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Preparar Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        850,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4-turbo",
+        "messages": {
+          "json": "={{[{ 'role': 'system', 'content': $node['Preparar Prompt'].json.system_prompt }, ...$node['Preparar Prompt'].json.messages, $node['Preparar Prompt'].json.new_message]}}"
+        }
+      },
+      "name": "OpenAI Chat",
+      "type": "n8n-nodes-base.openAiChat",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        500
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIALS_ID",
+          "name": "OpenAI credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "json": [
+            {
+              "name": "assistant_response",
+              "value": "={{ { 'role': 'assistant', 'content': $node['OpenAI Chat'].json.choices[0].message.content } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Preparar Guardado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{'http://backend:8000/api/conversations/' + $node['Obtener Historial'].json[0].id}}",
+        "method": "PUT",
+        "bodyParameters": {
+          "json": "={{[...$node['Preparar Prompt'].json.messages, $node['Preparar Prompt'].json.new_message, $node['Preparar Guardado'].json.assistant_response]}}"
+        },
+        "options": {}
+      },
+      "name": "Guardar Conversación",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "body": "={{$node['Preparar Guardado'].json.assistant_response.content}}",
+        "options": {}
+      },
+      "name": "Responder al Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1650,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [ [ { "node": "Obtener Historial", "type": "main", "index": 0 } ] ] },
+    "Obtener Historial": { "main": [ [ { "node": "Preparar Prompt", "type": "main", "index": 0 } ] ] },
+    "Preparar Prompt": { "main": [ [ { "node": "OpenAI Chat", "type": "main", "index": 0 } ] ] },
+    "OpenAI Chat": { "main": [ [ { "node": "Preparar Guardado", "type": "main", "index": 0 } ] ] },
+    "Preparar Guardado": { "main": [ [ { "node": "Guardar Conversación", "type": "main", "index": 0 } ] ] },
+    "Guardar Conversación": { "main": [ [ { "node": "Responder al Webhook", "type": "main", "index": 0 } ] ] }
+  },
+  "active": true,
+  "settings": {},
+  "id": "2"
+}

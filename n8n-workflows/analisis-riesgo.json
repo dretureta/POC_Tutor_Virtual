@@ -1,0 +1,145 @@
+{
+  "name": "Análisis de Riesgo Estudiantil",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "hours": 6
+            }
+          ]
+        }
+      },
+      "name": "Disparador cada 6 horas",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8000/api/students/at-risk/",
+        "options": {}
+      },
+      "name": "Obtener Estudiantes en Riesgo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "Loop Sobre Estudiantes",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "={{'Estudiante ' + $json['first_name'] + ' ' + $json['last_name'] + ' ha sido identificado con nivel de riesgo: ' + $json['risk_level']}}"
+            },
+            {
+              "name": "student_id",
+              "value": "={{$json['id']}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Crear Mensaje de Alerta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8000/api/alerts/",
+        "method": "POST",
+        "bodyParameters": {
+          "json": [
+            {
+              "name": "message",
+              "value": "={{$node['Crear Mensaje de Alerta'].json['message']}}"
+            },
+            {
+              "name": "student_id",
+              "value": "={{$node['Crear Mensaje de Alerta'].json['student_id']}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Enviar Alerta a la API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Disparador cada 6 horas": {
+      "main": [
+        [
+          {
+            "node": "Obtener Estudiantes en Riesgo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Estudiantes en Riesgo": {
+      "main": [
+        [
+          {
+            "node": "Loop Sobre Estudiantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Sobre Estudiantes": {
+      "main": [
+        [
+          {
+            "node": "Crear Mensaje de Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Mensaje de Alerta": {
+      "main": [
+        [
+          {
+            "node": "Enviar Alerta a la API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "1"
+}

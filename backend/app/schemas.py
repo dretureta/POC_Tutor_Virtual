@@ -64,3 +64,16 @@ class Conversation(ConversationBase):
     id: uuid.UUID
     start_time: datetime.datetime
     end_time: Optional[datetime.datetime]
+
+# --- Alert Schemas ---
+class AlertBase(TunedModel):
+    message: str
+    student_id: uuid.UUID
+
+class AlertCreate(AlertBase):
+    pass
+
+class Alert(AlertBase):
+    id: uuid.UUID
+    created_at: datetime.datetime
+    is_read: bool
