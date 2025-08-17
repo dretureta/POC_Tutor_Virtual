@@ -6,7 +6,7 @@
     </div>
 
     <!-- Message Display -->
-    <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+    <div class="flex-1 p-4 space-y-4 overflow-y-auto" aria-live="polite" aria-atomic="true">
       <div v-if="chatStore.loading">Cargando historial...</div>
       <div v-else-if="chatStore.error" class="text-red-500">{{ chatStore.error }}</div>
       <div v-else-if="!chatStore.conversation || chatStore.conversation.messages.length === 0" class="text-gray-500 text-center">
@@ -22,7 +22,9 @@
     <!-- Message Input -->
     <div class="p-4 border-t">
       <div class="flex items-center">
+        <label for="chat-input" class="sr-only">Mensaje</label>
         <input
+          id="chat-input"
           v-model="newMessage"
           @keyup.enter="handleSend"
           type="text"
@@ -32,6 +34,7 @@
         />
         <button
           @click="handleSend"
+          aria-label="Enviar mensaje"
           class="ml-4 px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300"
           :disabled="isSending || !newMessage.trim()"
         >

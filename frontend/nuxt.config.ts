@@ -2,6 +2,14 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: 'es'
+      }
+    }
+  },
+
   modules: ['@nuxt/ui', '@pinia/nuxt'],
 
   runtimeConfig: {
