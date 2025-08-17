@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from loguru import logger
 from .. import models, schemas, security
 
 def get_user_by_email(db: Session, email: str):
@@ -10,4 +11,5 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    logger.info(f"New user created: {user.email}")
     return db_user

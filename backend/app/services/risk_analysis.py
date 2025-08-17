@@ -1,4 +1,5 @@
 from typing import List
+from loguru import logger
 from ..models import Student, Evaluation, RiskLevel
 
 def analyze_student_risk(student: Student) -> RiskLevel:
@@ -37,6 +38,7 @@ def get_at_risk_students(students: List[Student]) -> List[Student]:
     """
     Filters a list of students to return only those at medium or high risk.
     """
+    logger.info(f"Running risk analysis for {len(students)} students.")
     at_risk_students = []
     for student in students:
         risk_level = analyze_student_risk(student)
@@ -44,4 +46,6 @@ def get_at_risk_students(students: List[Student]) -> List[Student]:
             # We can update the student's risk_level attribute if we want to persist it
             # student.risk_level = risk_level
             at_risk_students.append(student)
+
+    logger.info(f"Found {len(at_risk_students)} students at risk.")
     return at_risk_students
