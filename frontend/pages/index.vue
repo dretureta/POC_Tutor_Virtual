@@ -15,6 +15,11 @@
        <!-- Add more stats cards as needed -->
     </div>
 
+    <!-- Chart -->
+    <div class="mt-8">
+      <RiskTrendChart />
+    </div>
+
     <!-- Student List -->
     <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
       <h3 class="text-lg font-medium text-gray-700 mb-4">Lista de Estudiantes</h3>
@@ -50,6 +55,7 @@
 import { onMounted } from 'vue'
 import { useStudentStore } from '~/stores/studentStore'
 import StudentCard from '~/components/StudentCard.vue'
+import RiskTrendChart from '~/components/RiskTrendChart.vue'
 
 definePageMeta({
   layout: 'default'
