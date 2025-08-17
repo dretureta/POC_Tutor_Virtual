@@ -56,7 +56,12 @@ A continuación se presentan los pasos para levantar el entorno de desarrollo lo
 - **Backend (API)**: `http://localhost:8000`
 - **Documentación de la API (Swagger)**: `http://localhost:8000/docs`
 - **Frontend**: `http://localhost:3000`
+- **Frontend**: `http://localhost:3000` (requiere iniciar sesión)
 - **n8n**: `http://localhost:5678`
+
+### Nota sobre Autenticación
+
+La aplicación ahora cuenta con un sistema de autenticación. Después de levantar los servicios, el primer paso es registrar un nuevo usuario. Puedes hacerlo a través de la documentación de la API en `http://localhost:8000/docs` (endpoint `POST /api/auth/users/`). Luego, usa esas credenciales para iniciar sesión en el frontend.
 
 ## Pruebas
 

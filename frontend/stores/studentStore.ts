@@ -46,27 +46,29 @@ export const useStudentStore = defineStore('studentStore', {
     async fetchStudents() {
       this.loading = true
       this.error = null
-      const config = useRuntimeConfig()
-      const { data, error } = await useFetch<Student[]>(`${config.public.apiBase}/students`)
-      if (error.value) {
-        this.error = error.value.message
-      } else if (data.value) {
-        this.students = data.value
+      const { $api } = useNuxtApp()
+      try {
+        const data = await $api<Student[]>('/students')
+        this.students = data
+      } catch (e: any) {
+        this.error = e.data?.detail || 'Failed to fetch students'
+      } finally {
+        this.loading = false
       }
-      this.loading = false
     },
     async fetchStudentById(id: string) {
       this.loading = true
       this.error = null
       this.selectedStudent = null
-      const config = useRuntimeConfig()
-      const { data, error } = await useFetch<Student>(`${config.public.apiBase}/students/${id}`)
-      if (error.value) {
-        this.error = error.value.message
-      } else if (data.value) {
-        this.selectedStudent = data.value
+      const { $api } = useNuxtApp()
+      try {
+        const data = await $api<Student>(`/students/${id}`)
+        this.selectedStudent = data
+      } catch (e: any) {
+        this.error = e.data?.detail || 'Failed to fetch student'
+      } finally {
+        this.loading = false
       }
-      this.loading = false
     },
   },
 })

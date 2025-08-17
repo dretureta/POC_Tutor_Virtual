@@ -1,8 +1,13 @@
 from fastapi import APIRouter
 
-from .endpoints import students, evaluations, subjects, alerts, conversations
+from .endpoints import students, evaluations, subjects, alerts, conversations, auth
 
 api_router = APIRouter()
+
+# Authentication router
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+
+# Other routers
 api_router.include_router(students.router, prefix="/students", tags=["students"])
 api_router.include_router(evaluations.router, prefix="/evaluations", tags=["evaluations"])
 api_router.include_router(subjects.router, prefix="/subjects", tags=["subjects"])

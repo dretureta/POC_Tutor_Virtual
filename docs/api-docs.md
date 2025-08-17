@@ -6,11 +6,34 @@ Para una documentación interactiva y completa, una vez que el servicio del back
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
 
+## Autenticación
+
+La mayoría de los endpoints de esta API están protegidos y requieren un token de acceso JWT. El token debe ser enviado en el encabezado `Authorization` de la solicitud con el formato `Bearer {token}`.
+
+### `POST /api/auth/users/`
+
+- **Descripción**: Registra un nuevo usuario en el sistema.
+- **Cuerpo de la Solicitud**: `{ "email": "user@example.com", "password": "a-strong-password" }`
+- **Respuesta Exitosa (`200 OK`)**: Los detalles del usuario creado (sin la contraseña).
+
+### `POST /api/auth/token`
+
+- **Descripción**: Autentica a un usuario y devuelve un token de acceso.
+- **Cuerpo de la Solicitud**: `application/x-www-form-urlencoded` con `username` (el email) y `password`.
+- **Respuesta Exitosa (`200 OK`)**: Un token de acceso JWT.
+    ```json
+    {
+      "access_token": "ey...",
+      "token_type": "bearer"
+    }
+    ```
+
 ## Endpoints de Estudiantes (`/api/students`)
 
 ### `GET /api/students/`
 
 - **Descripción**: Obtiene una lista de todos los estudiantes.
+- **Protegido**: Sí.
 - **Parámetros de Query**:
     - `skip` (opcional, `int`): Número de registros a saltar. Default: `0`.
     - `limit` (opcional, `int`): Número máximo de registros a devolver. Default: `100`.
@@ -31,6 +54,7 @@ Para una documentación interactiva y completa, una vez que el servicio del back
 ### `POST /api/students/`
 
 - **Descripción**: Crea un nuevo estudiante.
+- **Protegido**: Sí.
 - **Cuerpo de la Solicitud**: Un objeto `StudentCreate`.
     ```json
     {
@@ -44,6 +68,7 @@ Para una documentación interactiva y completa, una vez que el servicio del back
 ### `GET /api/students/{student_id}`
 
 - **Descripción**: Obtiene los detalles de un estudiante específico por su ID.
+- **Protegido**: Sí.
 - **Parámetros de Ruta**:
     - `student_id` (requerido, `uuid`): El ID del estudiante.
 - **Respuesta Exitosa (`200 OK`)**: Un objeto `Student`.
@@ -52,6 +77,7 @@ Para una documentación interactiva y completa, una vez que el servicio del back
 ### `GET /api/students/at-risk/`
 
 - **Descripción**: Obtiene una lista de estudiantes que han sido identificados con un nivel de riesgo "medio" o "alto" por el servicio de análisis de riesgo.
+- **Protegido**: Sí.
 - **Respuesta Exitosa (`200 OK`)**: Un array de objetos `Student`.
 
 ## Endpoints de Evaluaciones (`/api/evaluations`)
@@ -59,6 +85,7 @@ Para una documentación interactiva y completa, una vez que el servicio del back
 ### `POST /api/evaluations/`
 
 - **Descripción**: Registra una nueva evaluación para un estudiante en una materia específica.
+- **Protegido**: Sí.
 - **Cuerpo de la Solicitud**: Un objeto `EvaluationCreate`.
     ```json
     {
@@ -74,6 +101,7 @@ Para una documentación interactiva y completa, una vez que el servicio del back
 ### `GET /api/subjects/{subject_name}/analytics`
 
 - **Descripción**: Obtiene estadísticas básicas para una materia específica, identificada por su nombre.
+- **Protegido**: Sí.
 - **Parámetros de Ruta**:
     - `subject_name` (requerido, `string`): El nombre de la materia (e.g., "Matemáticas").
 - **Respuesta Exitosa (`200 OK`)**: Un objeto con las analíticas.
@@ -86,6 +114,16 @@ Para una documentación interactiva y completa, una vez que el servicio del back
     }
     ```
 - **Respuesta de Error (`404 Not Found`)**: Si la materia no se encuentra.
+
+## Endpoints de Alertas (`/api/alerts`)
+
+- **Descripción**: Permiten gestionar las alertas del sistema.
+- **Protegido**: Sí.
+
+## Endpoints de Conversaciones (`/api/conversations`)
+
+- **Descripción**: Permiten gestionar las conversaciones de los tutores.
+- **Protegido**: Sí.
 
 ## Endpoint de Salud (`/health`)
 

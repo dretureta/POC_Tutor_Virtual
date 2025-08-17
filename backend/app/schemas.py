@@ -77,3 +77,22 @@ class Alert(AlertBase):
     id: uuid.UUID
     created_at: datetime.datetime
     is_read: bool
+
+# --- User Schemas ---
+class UserBase(TunedModel):
+    email: str
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: uuid.UUID
+    is_active: bool
+
+# --- Token Schemas ---
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: Optional[str] = None

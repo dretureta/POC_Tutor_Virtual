@@ -79,7 +79,18 @@ Una vez que todo está corriendo, puedes acceder a los diferentes componentes de
 - **n8n**: `http://localhost:5678` (Credenciales: `admin` / `admin123` según el `.env`)
 - **Base de Datos (PostgreSQL)**: Accesible en el puerto `5432` desde el host.
 
-## 4. Gestión de la Base de Datos
+## 4. Creación de un Usuario Administrador
+
+Dado que la API ahora está protegida, necesitarás un usuario para poder acceder a los endpoints y al frontend.
+
+1.  Asegúrate de que los servicios estén corriendo (`docker compose up -d`).
+2.  Puedes registrar un nuevo usuario directamente a través de la documentación interactiva de la API en `http://localhost:8000/docs`.
+    -   Ve a la sección `POST /api/auth/users/`.
+    -   Haz clic en "Try it out".
+    -   Ingresa un email y una contraseña en el cuerpo de la solicitud y haz clic en "Execute".
+3.  Una vez creado, puedes usar estas credenciales en la página de Login del frontend (`http://localhost:3000/login`).
+
+## 5. Gestión de la Base de Datos
 
 ### Migraciones
 

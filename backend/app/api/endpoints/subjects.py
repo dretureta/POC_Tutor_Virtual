@@ -4,11 +4,16 @@ from sqlalchemy import func
 
 from ... import crud, models
 from ...database import get_db
+from .. import deps
 
 router = APIRouter()
 
 @router.get("/{subject_name}/analytics")
-def get_subject_analytics(subject_name: str, db: Session = Depends(get_db)):
+def get_subject_analytics(
+    subject_name: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(deps.get_current_user)
+):
     subject = crud.subject.get_subject_by_name(db, name=subject_name)
     if not subject:
         raise HTTPException(status_code=404, detail="Subject not found")
