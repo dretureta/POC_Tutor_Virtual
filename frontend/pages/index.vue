@@ -17,7 +17,7 @@
 
     <!-- Chart -->
     <div class="mt-8">
-      <RiskTrendChart />
+      <LazyRiskTrendChart />
     </div>
 
     <!-- Student List -->
@@ -55,7 +55,6 @@
 import { onMounted } from 'vue'
 import { useStudentStore } from '~/stores/studentStore'
 import StudentCard from '~/components/StudentCard.vue'
-import RiskTrendChart from '~/components/RiskTrendChart.vue'
 
 definePageMeta({
   layout: 'default'

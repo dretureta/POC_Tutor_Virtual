@@ -1,6 +1,17 @@
+import { visualizer } from 'rollup-plugin-visualizer'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+
+  vite: {
+    plugins: [
+      process.env.ANALYZE && visualizer({
+        open: true,
+        filename: 'bundle-stats.html',
+      }),
+    ],
+  },
 
   app: {
     head: {

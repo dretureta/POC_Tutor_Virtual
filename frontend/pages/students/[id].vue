@@ -61,7 +61,7 @@
         </div>
 
         <!-- Render ChatInterface for the selected tutor -->
-        <ChatInterface :student-id="student.id" :tutor-type="selectedTutor" :key="selectedTutor" />
+        <LazyChatInterface :student-id="student.id" :tutor-type="selectedTutor" :key="selectedTutor" />
       </div>
     </div>
   </div>
@@ -72,7 +72,6 @@ import { useStudentStore } from '~/stores/studentStore'
 import { computed, ref } from 'vue'
 import RiskBadge from '~/components/RiskBadge.vue'
 import EvaluationCard from '~/components/EvaluationCard.vue'
-import ChatInterface from '~/components/ChatInterface.vue'
 
 definePageMeta({
   layout: 'default'
