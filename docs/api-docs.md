@@ -12,7 +12,7 @@ La mayoría de los endpoints de esta API están protegidos y requieren un token 
 
 ### `POST /api/auth/users/`
 
-- **Descripción**: Registra un nuevo usuario en el sistema.
+- **Descripción**: Registra un nuevo usuario en el sistema. **Requiere rol de Administrador.**
 - **Cuerpo de la Solicitud**: `{ "email": "user@example.com", "password": "a-strong-password" }`
 - **Respuesta Exitosa (`200 OK`)**: Los detalles del usuario creado (sin la contraseña).
 
@@ -118,7 +118,7 @@ La mayoría de los endpoints de esta API están protegidos y requieren un token 
 ## Endpoints de Alertas (`/api/alerts`)
 
 - **Descripción**: Permiten gestionar las alertas del sistema.
-- **Protegido**: Sí.
+- **Protegido**: Sí. El endpoint `GET /` para leer todas las alertas requiere rol de **Administrador**.
 
 ## Endpoints de Conversaciones (`/api/conversations`)
 

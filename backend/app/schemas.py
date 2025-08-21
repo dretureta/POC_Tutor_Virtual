@@ -3,6 +3,7 @@ import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from .models.student import RiskLevel
+from .models.user import UserRole
 
 # --- Base Schemas ---
 class TunedModel(BaseModel):
@@ -88,6 +89,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: uuid.UUID
     is_active: bool
+    role: UserRole
 
 # --- Token Schemas ---
 class Token(BaseModel):

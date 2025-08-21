@@ -3,13 +3,18 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from loguru import logger
 
-from ... import crud, schemas, security
+from ... import crud, models, schemas, security
 from ...database import get_db
+from .. import deps
 
 router = APIRouter()
 
 @router.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def create_user(
+    user: schemas.UserCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(deps.get_current_active_admin)
+):
     db_user = crud.user.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")

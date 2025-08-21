@@ -21,7 +21,7 @@ def read_alerts(
     db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_user)
+    current_user: models.User = Depends(deps.get_current_active_admin)
 ):
     alerts = crud.alert.get_alerts(db, skip=skip, limit=limit)
     return alerts

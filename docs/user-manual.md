@@ -4,9 +4,15 @@
 
 Bienvenido al sistema de Tutor Virtual Ceibal. Esta guía está diseñada para educadores y administradores y explica cómo utilizar la interfaz para monitorear el progreso de los estudiantes y interactuar con el sistema.
 
-## 2. Acceso al Sistema
+## 2. Roles de Usuario
 
-Para acceder al sistema, abre tu navegador web y dirígete a la URL proporcionada por el administrador del sistema (por ejemplo, `http://localhost:3000` en un entorno de desarrollo).
+El sistema cuenta con diferentes roles de usuario para controlar el acceso a las distintas funcionalidades. Principalmente:
+- **Profesor (Teacher)**: Este es el rol estándar. Puede ver a los estudiantes, sus detalles, y chatear con los tutores.
+- **Administrador (Admin)**: Tiene todos los permisos de un profesor, y además puede realizar acciones a nivel de sistema, como crear nuevos usuarios y ver todas las alertas del sistema.
+
+## 3. Acceso al Sistema
+
+Para acceder al sistema, abre tu navegador web y dirígete a la URL proporcionada (`http://localhost:3000`). Se te pedirá que inicies sesión con tu email y contraseña.
 
 ## 3. Dashboard Principal
 
