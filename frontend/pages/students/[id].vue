@@ -21,7 +21,24 @@
             </h2>
             <p class="text-gray-600 mt-1">{{ student.school }}</p>
           </div>
-          <RiskBadge :risk-level="student.risk_level" />
+          <div class="flex items-center space-x-4">
+            <div class="text-right">
+              <p class="text-2xl font-bold text-blue-600">{{ student.points }}</p>
+              <p class="text-sm text-gray-500">Puntos</p>
+            </div>
+            <RiskBadge :risk-level="student.risk_level" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Gamification Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Logros y Recompensas</h3>
+        <div v-if="student.badges && student.badges.length > 0" class="flex flex-wrap gap-4">
+          <Badge v-for="studentBadge in student.badges" :key="studentBadge.badge.id" :badge="studentBadge.badge" />
+        </div>
+        <div v-else class="text-gray-500">
+          Este estudiante aún no ha ganado insignias.
         </div>
       </div>
 
@@ -60,7 +77,6 @@
             </nav>
         </div>
 
-        <!-- Render ChatInterface for the selected tutor -->
         <LazyChatInterface :student-id="student.id" :tutor-type="selectedTutor" :key="selectedTutor" />
       </div>
     </div>
@@ -72,6 +88,7 @@ import { useStudentStore } from '~/stores/studentStore'
 import { computed, ref } from 'vue'
 import RiskBadge from '~/components/RiskBadge.vue'
 import EvaluationCard from '~/components/EvaluationCard.vue'
+import Badge from '~/components/Badge.vue'
 
 definePageMeta({
   layout: 'default'
@@ -81,15 +98,12 @@ const route = useRoute()
 const studentStore = useStudentStore()
 const studentId = route.params.id as string
 
-// --- Tutors ---
 const tutors = [
   { name: 'Matemáticas', webhook: '/tutor-math' },
   { name: 'Lengua', webhook: '/tutor-language' },
 ]
 const selectedTutor = ref(tutors[0].name)
 
-// --- Fetch student data ---
-// We don't wait for it here so the page can render while loading
 studentStore.fetchStudentById(studentId)
 
 const student = computed(() => studentStore.selectedStudent)

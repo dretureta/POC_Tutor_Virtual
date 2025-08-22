@@ -27,7 +27,7 @@ def create_student(
 ):
     return crud.student.create_student(db=db, student=student)
 
-@router.get("/{student_id}", response_model=schemas.Student)
+@router.get("/{student_id}", response_model=schemas.StudentProfile)
 def read_student(
     student_id: uuid.UUID,
     db: Session = Depends(get_db),

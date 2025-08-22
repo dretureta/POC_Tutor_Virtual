@@ -91,6 +91,21 @@ class User(UserBase):
     is_active: bool
     role: UserRole
 
+# --- Gamification Schemas ---
+class Badge(TunedModel):
+    id: uuid.UUID
+    name: str
+    description: str
+    icon: str
+
+class StudentBadge(TunedModel):
+    earned_at: datetime.datetime
+    badge: Badge
+
+class StudentProfile(Student):
+    points: int
+    badges: List[StudentBadge] = []
+
 # --- Token Schemas ---
 class Token(BaseModel):
     access_token: str

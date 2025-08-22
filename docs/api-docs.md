@@ -67,11 +67,11 @@ La mayoría de los endpoints de esta API están protegidos y requieren un token 
 
 ### `GET /api/students/{student_id}`
 
-- **Descripción**: Obtiene los detalles de un estudiante específico por su ID.
+- **Descripción**: Obtiene el perfil completo de un estudiante, incluyendo sus datos básicos, evaluaciones, puntos y logros (insignias).
 - **Protegido**: Sí.
 - **Parámetros de Ruta**:
     - `student_id` (requerido, `uuid`): El ID del estudiante.
-- **Respuesta Exitosa (`200 OK`)**: Un objeto `Student`.
+- **Respuesta Exitosa (`200 OK`)**: Un objeto `StudentProfile`.
 - **Respuesta de Error (`404 Not Found`)**: Si el estudiante no se encuentra.
 
 ### `GET /api/students/at-risk/`

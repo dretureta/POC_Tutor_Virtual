@@ -32,9 +32,10 @@ Puedes obtener más información sobre un estudiante específico haciendo clic e
 
 ### Secciones de la Vista de Detalle:
 
-- **Perfil del Estudiante**: Muestra el nombre completo del estudiante, su liceo y su nivel de riesgo.
-- **Historial de Evaluaciones**: Una lista detallada de todas las calificaciones que el estudiante ha recibido en las diferentes materias. Cada evaluación muestra la materia, la fecha y la calificación obtenida.
-- **Chat con Tutor**: Una interfaz de chat interactiva.
+- **Perfil del Estudiante**: Muestra el nombre completo del estudiante, su liceo, su nivel de riesgo y sus **puntos totales**.
+- **Logros y Recompensas**: Una sección que muestra todas las **insignias** (badges) que el estudiante ha ganado por su buen rendimiento. Puedes pasar el ratón sobre cada insignia para ver por qué fue otorgada.
+- **Historial de Evaluaciones**: Una lista detallada de todas las calificaciones que el estudiante ha recibido.
+- **Chat con Tutor**: Una interfaz de chat interactiva donde puedes seleccionar el tutor por materia.
 
 ## 5. Interacción con el Tutor Virtual (Chat)
 
