@@ -1,11 +1,14 @@
 from fastapi import APIRouter
 
-from .endpoints import students, evaluations, subjects, alerts, conversations, auth
+from .endpoints import students, evaluations, subjects, alerts, conversations, auth, chat
 
 api_router = APIRouter()
 
 # Authentication router
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+
+# WebSocket router
+api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
 
 # Other routers
 api_router.include_router(students.router, prefix="/students", tags=["students"])

@@ -1,69 +1,97 @@
 import { defineStore } from 'pinia'
+import { useAuthStore } from './authStore'
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
-interface Conversation {
-  id: string;
-  tutor_type: string;
-  messages: Message[];
-}
-
 export const useChatStore = defineStore('chatStore', {
   state: () => ({
-    conversation: null as Conversation | null,
+    messages: [] as Message[],
+    socket: null as WebSocket | null,
+    isConnected: false,
     loading: false,
     error: null as string | null,
   }),
 
   actions: {
-    async fetchConversation(studentId: string, tutorType: string) {
+    async fetchHistory(studentId: string, tutorType: string) {
+      // This part remains the same, to load initial history
       this.loading = true
       this.error = null
-      const config = useRuntimeConfig()
-
+      const { $api } = useNuxtApp()
       try {
-        // This endpoint returns a list of conversations, we'll find the right one
-        const conversations = await $fetch<Conversation[]>(`${config.public.apiBase}/conversations/${studentId}`)
-        this.conversation = conversations.find(c => c.tutor_type === tutorType) || null
+        const conversations = await $api<any[]>(`/conversations/${studentId}`)
+        const relevantConversation = conversations.find(c => c.tutor_type === tutorType)
+        this.messages = relevantConversation ? relevantConversation.messages : []
       } catch (e: any) {
-        // If not found (404), it's not an error, just no history.
         if (e.response?.status !== 404) {
-          this.error = e.message
+          this.error = "No se pudo cargar el historial de chat."
         }
-        this.conversation = null
+        this.messages = []
       } finally {
         this.loading = false
       }
     },
 
-    async sendMessage(studentId: string, tutorType: string, message: string) {
-        const userMessage: Message = { role: 'user', content: message };
-        if (!this.conversation || this.conversation.tutor_type !== tutorType) {
-            this.conversation = { id: '', tutor_type: tutorType, messages: [userMessage] };
-        } else {
-            this.conversation.messages.push(userMessage);
-        }
+    connect(studentId: string, tutorType: string) {
+      if (this.socket || this.isConnected) {
+        this.disconnect()
+      }
 
-        const webhookPath = tutorType === 'Matemáticas' ? '/tutor-math' : '/tutor-language';
+      const authStore = useAuthStore()
+      if (!authStore.token) {
+        this.error = "No estás autenticado."
+        return
+      }
 
-        try {
-            // NOTE: In a real app, this would be a call to the n8n webhook URL,
-            // which is on a different port. This is a placeholder.
-            const response = await $fetch<string>(`/api${webhookPath}`, {
-                method: 'POST',
-                body: { student_id: studentId, message: message }
-            });
+      // Use wss for secure connections in production
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      // Use the main host, not the API port
+      const wsUrl = `${wsProtocol}//${window.location.host}/api/chat/ws/chat/${studentId}/${tutorType}?token=${authStore.token}`
 
-            const assistantMessage: Message = { role: 'assistant', content: response };
-            this.conversation.messages.push(assistantMessage);
+      console.log(`Connecting to WebSocket: ${wsUrl}`)
+      this.socket = new WebSocket(wsUrl)
 
-        } catch (e: any) {
-            this.error = `Error al conectar con el tutor de ${tutorType}: ${e.message}`;
-            this.conversation.messages.pop();
-        }
+      this.socket.onopen = () => {
+        console.log("WebSocket connection established.")
+        this.isConnected = true
+        this.error = null
+      }
+
+      this.socket.onmessage = (event) => {
+        const message: Message = { role: 'assistant', content: event.data }
+        this.messages.push(message)
+      }
+
+      this.socket.onerror = (event) => {
+        console.error("WebSocket error:", event)
+        this.error = "Error en la conexión del chat en tiempo real."
+        this.isConnected = false
+      }
+
+      this.socket.onclose = () => {
+        console.log("WebSocket connection closed.")
+        this.isConnected = false
+        this.socket = null
+      }
+    },
+
+    disconnect() {
+      if (this.socket) {
+        this.socket.close()
+      }
+    },
+
+    sendMessage(message: string) {
+      if (this.socket && this.isConnected) {
+        const userMessage: Message = { role: 'user', content: message }
+        this.messages.push(userMessage)
+        this.socket.send(message)
+      } else {
+        this.error = "No hay una conexión activa para enviar el mensaje."
+      }
     },
   },
 })

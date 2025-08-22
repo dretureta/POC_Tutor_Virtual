@@ -136,3 +136,16 @@ La mayoría de los endpoints de esta API están protegidos y requieren un token 
       "status": "ok"
     }
     ```
+
+## Endpoint de Chat (WebSocket)
+
+### `WS /api/chat/ws/chat/{student_id}/{tutor_type}`
+
+- **Descripción**: Establece una conexión WebSocket para la comunicación en tiempo real con un tutor.
+- **Protegido**: Sí. La autenticación se realiza pasando el token JWT como un parámetro de query en la URL de conexión (e.g., `?token=ey...`).
+- **Parámetros de Ruta**:
+    - `student_id` (requerido, `uuid`): El ID del estudiante para el que es la conversación.
+    - `tutor_type` (requerido, `string`): El tipo de tutor (e.g., "Matemáticas", "Lengua").
+- **Flujo de Comunicación**:
+    - **Cliente a Servidor**: El cliente envía mensajes de texto plano (string) a través del WebSocket.
+    - **Servidor a Cliente**: El servidor envía las respuestas del tutor como mensajes de texto plano a través del WebSocket.

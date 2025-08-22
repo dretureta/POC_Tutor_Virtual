@@ -80,7 +80,13 @@ El stack tecnológico principal incluye:
 1.  **Generación de Datos**: Un script (`mock-data/generate_students.py`) genera datos simulados y los guarda en formato JSON. Estos datos pueden ser cargados en la base de datos a través de la API o un script de importación.
 2.  **Visualización de Datos**: El `Frontend` solicita datos a la `API del Backend` para mostrar información en los dashboards.
 3.  **Análisis de Riesgo (n8n)**: El servicio `n8n` periódicamente llama al endpoint `/api/students` del `Backend`, procesa los datos, y podría actualizar el nivel de riesgo de un estudiante a través de otro endpoint.
-4.  **Interacción del Tutor (Chat)**: El usuario interactúa con el `Frontend`. Los mensajes se envían al `Backend`, que a su vez puede activar un webhook en `n8n`. El workflow de `n8n` procesa la solicitud, llama a OpenAI, y devuelve la respuesta, que se guarda en la `Base de Datos` y se muestra en el `Frontend`.
+4.  **Interacción del Tutor (Chat en Tiempo Real con WebSockets)**:
+    1.  El `Frontend` inicia una conexión WebSocket con el `Backend` al abrir la interfaz de chat.
+    2.  El usuario envía un mensaje a través del WebSocket.
+    3.  El `Backend` recibe el mensaje y actúa como un "puente", llamando al webhook HTTP correspondiente en `n8n` (ej. `/tutor-math`).
+    4.  El workflow de `n8n` se ejecuta de forma síncrona: consulta a OpenAI y realiza las acciones necesarias. La respuesta del tutor se devuelve como la respuesta a la llamada HTTP del webhook.
+    5.  El `Backend` recibe la respuesta de n8n y la envía de vuelta al `Frontend` a través de la conexión WebSocket.
+    6.  El `Frontend` recibe el mensaje en tiempo real y lo muestra en la interfaz de chat.
 
 ## 5. Despliegue
 
