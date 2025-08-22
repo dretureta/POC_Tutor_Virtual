@@ -15,6 +15,12 @@
        <!-- Add more stats cards as needed -->
     </div>
 
+    <!-- Admin Section -->
+    <div v-if="authStore.user?.role === 'admin'" class="mt-8">
+      <h3 class="text-xl font-semibold text-gray-700 mb-4">Panel de Administración</h3>
+      <CsvUploadForm />
+    </div>
+
     <!-- Chart -->
     <div class="mt-8">
       <LazyRiskTrendChart />
@@ -54,13 +60,16 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useStudentStore } from '~/stores/studentStore'
+import { useAuthStore } from '~/stores/authStore'
 import StudentCard from '~/components/StudentCard.vue'
+import CsvUploadForm from '~/components/CsvUploadForm.vue'
 
 definePageMeta({
   layout: 'default'
 })
 
 const studentStore = useStudentStore()
+const authStore = useAuthStore()
 
 // Fetch students when the component is mounted
 onMounted(() => {

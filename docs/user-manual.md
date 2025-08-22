@@ -8,7 +8,7 @@ Bienvenido al sistema de Tutor Virtual Ceibal. Esta guía está diseñada para e
 
 El sistema cuenta con diferentes roles de usuario para controlar el acceso a las distintas funcionalidades. Principalmente:
 - **Profesor (Teacher)**: Este es el rol estándar. Puede ver a los estudiantes, sus detalles, y chatear con los tutores.
-- **Administrador (Admin)**: Tiene todos los permisos de un profesor, y además puede realizar acciones a nivel de sistema, como crear nuevos usuarios y ver todas las alertas del sistema.
+- **Administrador (Admin)**: Tiene todos los permisos de un profesor, y además puede realizar acciones a nivel de sistema, como crear nuevos usuarios, ver todas las alertas del sistema, e **importar estudiantes masivamente**.
 
 ## 3. Acceso al Sistema
 
@@ -25,6 +25,14 @@ Al ingresar, la primera pantalla que verás es el **Dashboard Principal**. Esta 
     - **En Riesgo**: El número total de estudiantes cuyo rendimiento ha sido marcado como "medio" o "alto" riesgo.
 - **Gráfico de Tendencias**: Un gráfico que muestra la evolución del número de estudiantes en riesgo a lo largo del tiempo. Esto te permite identificar patrones y la efectividad de las intervenciones.
 - **Lista de Estudiantes**: El área principal del dashboard, donde se muestra una lista de todos los estudiantes. Cada estudiante tiene una tarjeta con su nombre, liceo y su nivel de riesgo actual indicado por una insignia de color.
+
+### Panel de Administración (Solo para Admins)
+Si has iniciado sesión como Administrador, verás una sección adicional en el dashboard.
+
+- **Importar Estudiantes desde CSV**: Esta herramienta te permite añadir múltiples estudiantes al sistema de una sola vez.
+    1.  **Prepara tu archivo**: Crea un archivo CSV con las columnas `first_name`, `last_name`, y `school`.
+    2.  **Selecciona el archivo**: Haz clic en el botón para seleccionar archivos y elige tu archivo CSV.
+    3.  **Sube el archivo**: Haz clic en el botón "Subir". El sistema procesará el archivo en segundo plano. Recibirás un mensaje de confirmación y los estudiantes aparecerán en la lista poco después.
 
 ## 4. Vista de Detalle del Estudiante
 

@@ -38,8 +38,7 @@ export const useAuthStore = defineStore('authStore', {
         const tokenCookie = useCookie('auth_token')
         tokenCookie.value = token
 
-        // Optionally, you can fetch user profile here and store it
-        // await this.fetchUserProfile()
+        await this.fetchUserProfile()
 
         return true
       } catch (e: any) {
@@ -55,11 +54,22 @@ export const useAuthStore = defineStore('authStore', {
       tokenCookie.value = null
       this.token = null
       this.user = null
+      // Redirect to login page
+      const router = useRouter()
+      router.push('/login')
     },
 
-    // Example action to fetch user profile after login
-    // async fetchUserProfile() {
-    //   ...
-    // }
+    async fetchUserProfile() {
+      if (!this.token) return
+
+      const { $api } = useNuxtApp()
+      try {
+        const user = await $api<User>('/auth/me')
+        this.user = user
+      } catch (e) {
+        console.error("Failed to fetch user profile", e)
+        this.logout() // Log out if token is invalid
+      }
+    }
   },
 })

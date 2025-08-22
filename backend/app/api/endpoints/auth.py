@@ -37,3 +37,10 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
         data={"sub": user.email}
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me", response_model=schemas.User)
+def read_users_me(current_user: models.User = Depends(deps.get_current_user)):
+    """
+    Get current user.
+    """
+    return current_user

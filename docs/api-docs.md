@@ -80,6 +80,19 @@ La mayoría de los endpoints de esta API están protegidos y requieren un token 
 - **Protegido**: Sí.
 - **Respuesta Exitosa (`200 OK`)**: Un array de objetos `Student`.
 
+### `POST /api/students/upload-csv`
+
+- **Descripción**: Permite subir un archivo CSV para crear múltiples estudiantes de forma masiva. La tarea se procesa en segundo plano.
+- **Protegido**: Sí. **Requiere rol de Administrador.**
+- **Cuerpo de la Solicitud**: `multipart/form-data` con un archivo (`file`) que sea de tipo `text/csv`.
+- **Formato del CSV**: El archivo debe contener las siguientes columnas en el encabezado: `first_name`, `last_name`, `school`.
+- **Respuesta Exitosa (`200 OK`)**: Un mensaje de confirmación.
+    ```json
+    {
+      "message": "El archivo CSV se está procesando en segundo plano. Los estudiantes aparecerán en breve."
+    }
+    ```
+
 ## Endpoints de Evaluaciones (`/api/evaluations`)
 
 ### `POST /api/evaluations/`
