@@ -29,27 +29,9 @@ poc-tutor-virtual/
 
 ## Configuración y Ejecución
 
-A continuación se presentan los pasos para levantar el entorno de desarrollo local. Para una guía más detallada, consulta el documento de [configuración de desarrollo](./docs/development-setup.md).
+Para obtener una guía de instalación completa y detallada, paso a paso, por favor consulta el siguiente documento:
 
-### 1. Prerrequisitos
-
-- Docker y Docker Compose
-
-### 2. Configuración
-
-1.  **Clonar el repositorio**:
-    ```bash
-    git clone <URL_DEL_REPOSITORIO>
-    cd poc-tutor-virtual
-    ```
-2.  **Crear archivo de entorno**: Copia el archivo de ejemplo `.env.example` a `.env` y añade tu clave de API de OpenAI.
-    ```bash
-    cp .env.example .env
-    ```
-3.  **Levantar los servicios**:
-    ```bash
-    docker compose up -d --build
-    ```
+### ➡️ [**Guía de Instalación Detallada (`INSTALACION.md`)**](./INSTALACION.md)
 
 ### 3. Acceso a los Servicios
 
