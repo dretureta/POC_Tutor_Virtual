@@ -1,5 +1,7 @@
 # POC Tutor Virtual Ceibal
 
+> **Nota del Proyecto:** Este proyecto ha completado su fase de desarrollo inicial. Para un resumen completo del estado final, las funcionalidades implementadas y el roadmap de próximos pasos, por favor consulta el **[Documento de Traspaso (`HANDOVER.md`)](./HANDOVER.md)**.
+
 ## Objetivo
 
 Crear una Prueba de Concepto (POC) funcional de un sistema de tutor virtual que analiza datos de evaluaciones estudiantiles (simulados) y genera agentes tutores adaptativos usando n8n y OpenAI.
