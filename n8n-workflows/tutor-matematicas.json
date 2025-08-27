@@ -1,215 +1,72 @@
 {
-  "name": "Tutor de Matemáticas",
+  "name": "Tutor de Matemáticas (con Anonimización)",
   "nodes": [
+    { "parameters": { "path": "tutor-math", "httpMethod": "POST" }, "name": "Webhook", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [ 250, 500 ] },
+    { "parameters": { "url": "={{'http://backend:8000/api/students/' + $json.body.student_id}}", "options": {} }, "name": "Obtener Datos Estudiante", "type": "n8n-nodes-base.httpRequest", "typeVersion": 2, "position": [ 450, 500 ] },
+    { "parameters": { "url": "={{'http://backend:8000/api/conversations/' + $json.body.student_id}}", "options": { "ignoreStatusCodes": [404] } }, "name": "Obtener Historial", "type": "n8n-nodes-base.httpRequest", "typeVersion": 2, "position": [ 650, 500 ] },
     {
       "parameters": {
-        "path": "tutor-math",
-        "httpMethod": "POST"
+        "javascriptCode": "const student = $getNode('Obtener Datos Estudiante').json;\nconst history = $getNode('Obtener Historial').json[0] ? $getNode('Obtener Historial').json[0].messages : [];\nconst newMessage = { role: 'user', content: $json.body.message };\n\nconst studentName = `${student.first_name} ${student.last_name}`;\nconst placeholder = '[ESTUDIANTE]';\n\nconst anonymize = (text) => text.replace(new RegExp(studentName, 'gi'), placeholder);\n\nconst anonymizedHistory = history.map(msg => ({ ...msg, content: anonymize(msg.content) }));\nconst anonymizedNewMessage = { ...newMessage, content: anonymize(newMessage.content) };\n\nreturn {\n  anonymizedHistory,\n  anonymizedNewMessage,\n  studentName,\n  placeholder\n};"
       },
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
+      "name": "Anonimizar Conversación",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 1,
-      "position": [
-        450,
-        500
-      ]
-    },
-    {
-      "parameters": {
-        "url": "={{'http://backend:8000/api/conversations/' + $json.body.student_id}}",
-        "options": {}
-      },
-      "name": "Obtener Historial",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [
-        650,
-        500
-      ]
-    },
-    {
-      "parameters": {
-        "values": {
-          "string": [
-            {
-              "name": "system_prompt",
-              "value": "Eres un tutor de matemáticas amigable y experto, especializado en el currículum de liceo de Uruguay. Explica los conceptos paso a paso de forma clara y sencilla. Tu objetivo es ayudar al estudiante a entender, no darle la respuesta directamente. Pregúntale qué ha intentado hasta ahora."
-            }
-          ],
-          "json": [
-            {
-              "name": "messages",
-              "value": "={{$node['Obtener Historial'].json[0] ? $node['Obtener Historial'].json[0].messages : []}}"
-            },
-            {
-              "name": "new_message",
-              "value": "={{ { 'role': 'user', 'content': $json.body.message } }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "name": "Preparar Prompt",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 1,
-      "position": [
-        850,
-        500
-      ]
+      "position": [ 850, 500 ]
     },
     {
       "parameters": {
         "model": "gpt-4-turbo",
         "messages": {
-          "json": "={{[{ 'role': 'system', 'content': $node['Preparar Prompt'].json.system_prompt }, ...$node['Preparar Prompt'].json.messages, $node['Preparar Prompt'].json.new_message]}}"
+          "json": "={{[{ 'role': 'system', 'content': 'Eres un tutor de matemáticas amigable y experto... Tu placeholder para el nombre del estudiante es [ESTUDIANTE].' }, ...$node['Anonimizar Conversación'].json.anonymizedHistory, $node['Anonimizar Conversación'].json.anonymizedNewMessage]}}"
         }
       },
       "name": "OpenAI Chat",
       "type": "n8n-nodes-base.openAiChat",
       "typeVersion": 1,
-      "position": [
-        1050,
-        500
-      ],
-      "credentials": {
-        "openAiApi": {
-          "id": "YOUR_OPENAI_CREDENTIALS_ID",
-          "name": "OpenAI credentials"
-        }
-      }
+      "position": [ 1050, 500 ],
+      "credentials": { "openAiApi": { "id": "YOUR_OPENAI_CREDENTIALS_ID", "name": "OpenAI credentials" } }
     },
     {
       "parameters": {
-        "values": {
-          "json": [
-            {
-              "name": "assistant_response",
-              "value": "={{ { 'role': 'assistant', 'content': $node['OpenAI Chat'].json.choices[0].message.content } }}"
-            }
-          ]
-        },
-        "options": {}
+        "javascriptCode": "const assistantResponse = $getNode('OpenAI Chat').json.choices[0].message.content;\nconst { studentName, placeholder } = $getNode('Anonimizar Conversación').json;\n\nconst deanonymizedResponse = assistantResponse.replace(new RegExp(placeholder.replace(/[\\[\\]]/g, '\\\\$&'), 'gi'), studentName);\n\nreturn {\n  role: 'assistant',\n  content: deanonymizedResponse\n};"
       },
-      "name": "Preparar Guardado",
-      "type": "n8n-nodes-base.set",
+      "name": "De-anonimizar Respuesta",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 1,
-      "position": [
-        1250,
-        500
-      ]
+      "position": [ 1250, 500 ]
     },
     {
       "parameters": {
-        "url": "={{'http://backend:8000/api/conversations/' + $node['Obtener Historial'].json[0].id}}",
-        "method": "PUT",
+        "url": "={{$node['Obtener Historial'].json[0] ? 'http://backend:8000/api/conversations/' + $node['Obtener Historial'].json[0].id : 'http://backend:8000/api/conversations/'}}",
+        "method": "={{$node['Obtener Historial'].json[0] ? 'PUT' : 'POST'}}",
         "bodyParameters": {
-          "json": "={{[...$node['Preparar Prompt'].json.messages, $node['Preparar Prompt'].json.new_message, $node['Preparar Guardado'].json.assistant_response]}}"
+          "json": "={{$node['Obtener Historial'].json[0] ? [ ...$node['Obtener Historial'].json[0].messages, { role: 'user', content: $json.body.message }, $node['De-anonimizar Respuesta'].json ] : { 'student_id': $json.body.student_id, 'tutor_type': 'Matemáticas', 'messages': [ { role: 'user', content: $json.body.message }, $node['De-anonimizar Respuesta'].json ] } }}"
         },
         "options": {}
       },
       "name": "Guardar Conversación",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
-      "position": [
-        1450,
-        500
-      ]
+      "position": [ 1450, 500 ]
     },
     {
-      "parameters": {
-        "body": "={{$node['Preparar Guardado'].json.assistant_response.content}}",
-        "options": {}
-      },
+      "parameters": { "body": "={{$node['De-anonimizar Respuesta'].json.content}}", "options": {} },
       "name": "Responder al Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [
-        1650,
-        500
-      ]
+      "position": [ 1650, 500 ]
     }
   ],
   "connections": {
-    "Webhook": { "main": [ [ { "node": "Obtener Historial", "type": "main", "index": 0 } ] ] },
-    "Obtener Historial": { "main": [ [ { "node": "Preparar Prompt", "type": "main", "index": 0 } ] ] },
-    "Preparar Prompt": { "main": [ [ { "node": "OpenAI Chat", "type": "main", "index": 0 } ] ] },
-    "OpenAI Chat": { "main": [ [ { "node": "Preparar Guardado", "type": "main", "index": 0 } ] ] },
-    "Preparar Guardado": { "main": [ [ { "node": "Guardar Conversación", "type": "main", "index": 0 } ] ] },
-    "Guardar Conversación": { "main": [ [ { "node": "Responder al Webhook", "type": "main", "index": 0 } ] ] },
-    "Obtener Historial": {
-      "main": [
-        [
-          {
-            "node": "Preparar Prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ],
-      "error": [
-        [
-          {
-            "node": "Error en la App",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Chat": {
-      "main": [
-        [
-          {
-            "node": "Preparar Guardado",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ],
-      "error": [
-        [
-          {
-            "node": "Error en OpenAI",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Webhook": { "main": [ [ { "node": "Obtener Datos Estudiante", "type": "main", "index": 0 } ] ] },
+    "Obtener Datos Estudiante": { "main": [ [ { "node": "Obtener Historial", "type": "main", "index": 0 } ] ] },
+    "Obtener Historial": { "main": [ [ { "node": "Anonimizar Conversación", "type": "main", "index": 0 } ] ] },
+    "Anonimizar Conversación": { "main": [ [ { "node": "OpenAI Chat", "type": "main", "index": 0 } ] ] },
+    "OpenAI Chat": { "main": [ [ { "node": "De-anonimizar Respuesta", "type": "main", "index": 0 } ] ] },
+    "De-anonimizar Respuesta": { "main": [ [ { "node": "Guardar Conversación", "type": "main", "index": 0 } ] ] },
+    "Guardar Conversación": { "main": [ [ { "node": "Responder al Webhook", "type": "main", "index": 0 } ] ] }
   },
   "active": true,
-  "settings": {
-    "errorWorkflow": "4"
-  },
+  "settings": {},
   "id": "2"
-},
-{
-      "parameters": {
-        "body": "Lo siento, el servicio de IA no está disponible en este momento. Por favor, inténtalo de nuevo más tarde.",
-        "options": {
-          "responseCode": 503
-        }
-      },
-      "name": "Error en OpenAI",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [
-        1250,
-        350
-      ]
-    },
-    {
-      "parameters": {
-        "body": "Lo siento, estoy experimentando problemas técnicos para recuperar tu historial. Por favor, inténtalo de nuevo más tarde.",
-        "options": {
-          "responseCode": 500
-        }
-      },
-      "name": "Error en la App",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [
-        850,
-        350
-      ]
-    }
+}
